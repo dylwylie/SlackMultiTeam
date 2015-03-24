@@ -49,46 +49,46 @@ class SlackBot():
 	# !BLOCKING! #
 	def runListener(self,messageHandler,timeOfLastMessage=str(time.time())):
 
-		arguments = ['channel='+self.channel,'inclusive=0']
-		arguments.append('oldest='+timeOfLastMessage)
+		while(1):
+			arguments = ['channel='+self.channel,'inclusive=0']
+			arguments.append('oldest='+timeOfLastMessage)
 
-		r = self.call('channels.history',arguments)
+			r = self.call('channels.history',arguments)
 
-		try:
-			response = r.json()
-			messages = response[unicode('messages')]
+			try:
+				response = r.json()
+				messages = response[unicode('messages')]
 
-			if(messages): #Has we some messages to deal with?
+				if(messages): #Has we some messages to deal with?
 
-				times = []
+					times = []
 
-				for message in messages:
-					messageTime = message[unicode('ts')]
+					for message in messages:
+						messageTime = message[unicode('ts')]
 
-					if(messageTime != timeOfLastMessage):
+						if(messageTime != timeOfLastMessage):
 
-						text = message[unicode('text')]
-						user_id = message[unicode('user')]
-						user_profile = self.getUser(user_id)
-						username = user_profile[unicode('name')]
-						user_image = user_profile[unicode('profile')][unicode('image_48')]
+							text = message[unicode('text')]
+							user_id = message[unicode('user')]
+							user_profile = self.getUser(user_id)
+							username = user_profile[unicode('name')]
+							user_image = user_profile[unicode('profile')][unicode('image_48')]
 
-						messageHandler(text,username,user_image)
-						#handle our messages
-						
-						del text,user_id,user_profile,username,user_image
-					#Take the timestamp of each message
-					times.append(messageTime) 
+							messageHandler(text,username,user_image)
+							#handle our messages
+							
+							del text,user_id,user_profile,username,user_image
+						#Take the timestamp of each message
+						times.append(messageTime) 
 
-				#Get the timestamp of the latest one
-				timeOfLastMessage = max(times) 
-				del response,messages
-		except ValueError,e:
-			print(e)
-		except KeyError,e:
-			timeOfLastMessage = time.time()
+					#Get the timestamp of the latest one
+					timeOfLastMessage = max(times) 
+					del response,messages
+			except ValueError,e:
+				print(e)
+			except KeyError,e:
+				timeOfLastMessage = time.time()
 
-		del arguments,r
-		time.sleep(0.1)
+			del arguments,r
+			time.sleep(0.1)
 		#Run again but only check for messages later than the latest on we've already done
-		self.runListener(messageHandler,str(timeOfLastMessage)) 

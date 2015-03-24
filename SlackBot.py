@@ -76,17 +76,19 @@ class SlackBot():
 						messageHandler(text,username,user_image)
 						#handle our messages
 						
-
+						del text,user_id,user_profile,username,user_image
 					#Take the timestamp of each message
 					times.append(messageTime) 
 
 				#Get the timestamp of the latest one
 				timeOfLastMessage = max(times) 
-
+				del response,messages
 		except ValueError,e:
 			print(e)
 		except KeyError,e:
 			timeOfLastMessage = time.time()
 
+		del arguments,r
+		time.sleep(0.1)
 		#Run again but only check for messages later than the latest on we've already done
 		self.runListener(messageHandler,str(timeOfLastMessage)) 

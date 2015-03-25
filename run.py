@@ -27,7 +27,7 @@ slackBot21 = SlackBot.SlackBot(apiKey2,channelKey2)
 slackBot22 = SlackBot.SlackBot(apiKey2,channelKey2)
 
 handler1 = ListenerHandler(slackBot11,slackBot21)
-handler2 = ListenerHandler(slackBot21,slackBot12)
+handler2 = ListenerHandler(slackBot22,slackBot12)
 
 thread1 = threading.Thread(target=handler1.run)
 thread2 = threading.Thread(target=handler2.run)

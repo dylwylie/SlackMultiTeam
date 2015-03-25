@@ -87,7 +87,7 @@ class SlackBot():
 			except ValueError,e:
 				print(e)
 			except KeyError,e:
-				timeOfLastMessage = time.time()
+				timeOfLastMessage = str(time.time())
 
 			del arguments,r
 			time.sleep(0.1)

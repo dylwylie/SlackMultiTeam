@@ -8,6 +8,7 @@ class SlackBot():
 
 		self.token = 'token=' +  token
 		self.channel = channel
+		self.updateWhoIsInThisChannel()
 
 	def call(self,method,arguments=None):
 
@@ -36,15 +37,41 @@ class SlackBot():
 
 		arguments = ['name='+channel]
 		r = self.call('channels.join',arguments)
+
 	def listChannels(self):
 
-		r = self.call('channels.list')
+		return self.call('channels.list')
+
+	def channelInfo(self,channel):
+
+		arguments = ['channel='+channel]
+		r = self.call('channels.info',arguments)
+		return r.json()
 
 	def getUser(self,id):
 
 		arguments = ['user='+id]
 		r = self.call('users.info',arguments)
 		return(r.json()[unicode('user')])
+
+	def updateWhoIsInThisChannel(self):
+
+		channel_user_ids = self.channelInfo(self.channel)["channel"]["members"]
+
+		user_ids = []
+		usernames = []
+
+		for user_id in channel_user_ids:
+
+			username = self.getUser(user_id)["name"]
+			user_ids.append(user_id)
+			usernames.append(username)
+
+		#doubly keyed list of the form {user_id : username}
+		self.channel_users = dict(zip(user_ids,usernames))
+		return True
+
+
 
 	# !BLOCKING! #
 	def runListener(self,messageHandler,timeOfLastMessage=str(time.time())):

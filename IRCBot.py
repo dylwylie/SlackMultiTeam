@@ -53,24 +53,21 @@ class IRCBot(irc.IRCClient):
 
 	def lineReceived(self,line):
 
-		parsedIRC = parseIRC(line)
+		parsedIRC = self.parseIRC(line)
 
 		try:
-			self.factory.messageHandler(parsedIRC['message'],parsedIRC['username'])
+			if (parsedIRC['command'] == 'PRIVMSG'):
+				self.factory.messageHandler(parsedIRC['message'],parsedIRC['username'])
 
 		except IndexError:
 			pass	
 
 		irc.IRCClient.lineReceived(self,line)
 
-	def msg(self,message):
-
-		irc.IRCClient.msg(self.factory.channel,text)
-
-	def sendMessage(self,username,message,image=None):
+	def sendMessage(self,username,message):
 
 		messageToSend = username + ': ' + message
-		self.msg(messageToSend)
+		irc.IRCClient.msg(self,self.factory.channel,str(messageToSend))
 
 
 class BotFactory(protocol.ClientFactory):
@@ -83,9 +80,9 @@ class BotFactory(protocol.ClientFactory):
 
 	def buildProtocol(self,addr):
 
-		ircBot = IRCBot(self.nickname)
-		ircBot.factory = self
-		return ircBot
+		self.ircBot = IRCBot(self.nickname)
+		self.ircBot.factory = self
+		return self.ircBot
 
 	def clientConnnectionLost(self,connector,reason):
 
@@ -99,6 +96,10 @@ class BotFactory(protocol.ClientFactory):
 		print("Can't connect :( : " + str(reason))
 		reactor.stop()
 
+	def sendMessage(self,username,text):
+
+		self.ircBot.sendMessage(username,text)
+
 class IRCBotRunner():
 
 	def __init__(self,nickname,channel):
@@ -108,11 +109,17 @@ class IRCBotRunner():
 
 	def runListener(self,messageHandler):
 
-		factory = BotFactory(self.nickname,self.channel,messageHandler)
-		reactor.connectTCP("irc.freenode.net",6667,factory)
-		print("Connected.....")
+		self.factory = BotFactory(self.nickname,self.channel,messageHandler)
+		reactor.connectTCP("irc.freenode.net",6667,self.factory)
+		print("Connected..... ")
 		reactor.run()
 		print("Done!")
+
+	def sendMessage(self,username,text,icon_url=None):
+
+		self.factory.sendMessage(username,text)
+
+
 
 	#slackBot = SlackBot('test')
 	#slackBotListener = SlackBotListener()

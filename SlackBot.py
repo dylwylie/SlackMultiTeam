@@ -8,7 +8,7 @@ class SlackBot():
 
 		self.token = 'token=' +  token
 		self.channel = channel
-		self.updateWhoIsInThisChannel()
+		self.channel_users = usersInThisChannel()
 
 	def call(self,method,arguments=None):
 
@@ -20,7 +20,7 @@ class SlackBot():
 
 				URL+= '&' + argument
 
-		return requests.get(URL)
+		return requests.get(URL)∫
 
 	def sendMessage(self,username,text,icon_url=None):
 
@@ -54,7 +54,7 @@ class SlackBot():
 		r = self.call('users.info',arguments)
 		return(r.json()[unicode('user')])
 
-	def updateWhoIsInThisChannel(self):
+	def usersInThisChannel(self):
 
 		channel_user_ids = self.channelInfo(self.channel)["channel"]["members"]
 
@@ -68,15 +68,16 @@ class SlackBot():
 			usernames.append(username)
 
 		#doubly keyed list of the form {user_id : username}
-		self.channel_users = dict(zip(user_ids,usernames))
-		return True
+		return dict(zip(user_ids,usernames))
 
 
 
 	# !BLOCKING! #
 	def runListener(self,messageHandler,timeOfLastMessage=str(time.time())):
 
+		loops = 0 #Use this to call things we don't want to every 0.1 seconds
 		while(1):
+
 			arguments = ['channel='+self.channel,'inclusive=0']
 			arguments.append('oldest='+timeOfLastMessage)
 
@@ -111,6 +112,13 @@ class SlackBot():
 					#Get the timestamp of the latest one
 					timeOfLastMessage = max(times) 
 					del response,messages
+
+				loops += 1
+
+				if(loops > 10):
+					self.channel_users = usersInThisChannel()
+					loops = 0
+
 			except ValueError,e:
 				print(e)
 			except KeyError,e:

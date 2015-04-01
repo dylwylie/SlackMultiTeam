@@ -1,10 +1,4 @@
-import SlackBot,threading
-
-apiKey1 = 'FIRST SLACK API KEY'
-apiKey2 = 'SECOND SLACK API KEY'
-
-channelKey1 = 'CHANNEL IN FIRST SLACK'
-channelKey2 = 'CHANNEL IN SECOND SLACK'
+import SlackBot,threading,config
 
 class ListenerHandler():
 
@@ -21,10 +15,10 @@ class ListenerHandler():
 
 		self.ListenerObject.runListener(messageHandler=self.callback)
 
-slackBot11 = SlackBot.SlackBot(apiKey1,channelKey1)
-slackBot12 = SlackBot.SlackBot(apiKey1,channelKey1)
-slackBot21 = SlackBot.SlackBot(apiKey2,channelKey2)
-slackBot22 = SlackBot.SlackBot(apiKey2,channelKey2)
+slackBot11 = SlackBot.SlackBot(config.apiKey1,config.channelKey1)
+slackBot12 = SlackBot.SlackBot(config.apiKey1,config.channelKey1)
+slackBot21 = SlackBot.SlackBot(config.apiKey2,config.channelKey2)
+slackBot22 = SlackBot.SlackBot(config.apiKey2,config.channelKey2)
 
 handler1 = ListenerHandler(slackBot11,slackBot21)
 handler2 = ListenerHandler(slackBot22,slackBot12)

@@ -32,5 +32,3 @@ thread2 = threading.Thread(target=handler2.run)
 thread1.start()
 thread2.start()
 
-handler2.run()
-
